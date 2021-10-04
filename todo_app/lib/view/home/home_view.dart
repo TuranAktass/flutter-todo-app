@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/component/app_drawer.dart';
 import 'package:todo_app/data_model/todo.dart';
+import 'package:todo_app/database/database.dart';
 import 'package:todo_app/utils/color_constants.dart' as color_constants;
-import 'package:todo_app/fake_data.dart' as fake_data;
+import 'package:todo_app/view/add_todo/input_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -13,14 +14,35 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  List<ToDo> list = fake_data.list;
+  List<ToDo> list = [];
+
+  bool _isLoading = false;
+
+  getTodosFromDatabase() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    list = await ToDoDatabase.instance.readAllTodos();
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    getTodosFromDatabase();
+    super.initState();
+  }
+
   List<ToDo> importants = [];
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
     for (int i = 0; i < list.length; i++) {
-      if (list[i].isImportant!) {
+      if (list[i].isImportant == 1) {
         importants.add(list[i]);
       }
     }
@@ -33,7 +55,9 @@ class _HomeViewState extends State<HomeView> {
           buildImportantsList(size),
 
           //other elements will be inside this expanded
-          buildHistoryList(),
+          list.isEmpty
+              ? const Center(child: Text("There's no Data"))
+              : buildHistoryList(),
         ],
       ),
       floatingActionButton: buildFloatingActionButton(),
@@ -44,12 +68,12 @@ class _HomeViewState extends State<HomeView> {
     return Expanded(
         flex: 2,
         child: ListView.builder(
-          itemCount: 5,
+          itemCount: list.length,
           itemBuilder: (context, index) {
             return ListTile(
                 trailing: const Icon(Icons.arrow_forward),
-                title: Text(list[index].title!),
-                subtitle: Text(dateFormat(list[index].createdAt!, true)));
+                title: Text(list[index].title),
+                subtitle: Text(list[index].createdAt));
           },
         ));
   }
@@ -94,8 +118,8 @@ class _HomeViewState extends State<HomeView> {
               ListTile(
                 trailing: IconButton(
                     icon: const Icon(Icons.expand_more), onPressed: () {}),
-                title: Text(importants[index].title!),
-                subtitle: Text(dateFormat(importants[index].createdAt!, false)),
+                title: Text(importants[index].title),
+                subtitle: Text(importants[index].createdAt),
               ),
               Padding(
                   padding: const EdgeInsets.all(16),
@@ -103,7 +127,7 @@ class _HomeViewState extends State<HomeView> {
                       decoration: const BoxDecoration(),
                       height: size.height / 8,
                       child: SingleChildScrollView(
-                          child: Text(importants[index].text!,
+                          child: Text(importants[index].text,
                               textAlign: TextAlign.start)))),
               ButtonBar(
                 alignment: MainAxisAlignment.end,
@@ -132,7 +156,7 @@ class _HomeViewState extends State<HomeView> {
         height: size.height / 2,
         child: Column(
           children: [
-            Text(importants[index].title!),
+            Text(importants[index].title),
           ],
         ));
   }
@@ -149,7 +173,10 @@ class _HomeViewState extends State<HomeView> {
 
   FloatingActionButton buildFloatingActionButton() {
     return FloatingActionButton(
-      onPressed: () {},
+      onPressed: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const InputView()));
+      },
       child: const Icon(Icons.add),
       backgroundColor: color_constants.sapphire,
     );

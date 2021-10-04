@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo_app/component/app_drawer.dart';
+import 'package:todo_app/data_model/todo.dart';
+import 'package:todo_app/database/database.dart';
 import 'package:todo_app/utils/color_constants.dart' as const_color;
 import 'package:todo_app/view/todo_list/todo_list_view.dart';
 
@@ -12,6 +14,7 @@ class InputView extends StatefulWidget {
 
 class _InputViewState extends State<InputView> {
   final TextEditingController textController = TextEditingController();
+  final TextEditingController titleController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -37,15 +40,6 @@ class _InputViewState extends State<InputView> {
             ),
           ),
         ));
-  }
-
-  IconButton buildIconButton() {
-    return IconButton(
-      iconSize: 60,
-      color: const_color.electricViolet,
-      icon: const Icon(Icons.done),
-      onPressed: () {},
-    );
   }
 
   Padding buildPadding(double pad) {
@@ -76,6 +70,7 @@ class _InputViewState extends State<InputView> {
 
   TextField buildTitleTextField(BuildContext context) {
     return TextField(
+        controller: titleController,
         style: Theme.of(context)
             .textTheme
             .bodyText2!
@@ -102,8 +97,19 @@ class _InputViewState extends State<InputView> {
                 MaterialPageRoute(builder: (context) => const ToDoListView()));
           },
         ),
-        Padding(padding: EdgeInsets.all(10)),
-        Icon(Icons.done, size: 30, color: Colors.white),
+        const Padding(padding: EdgeInsets.all(10)),
+        IconButton(
+          icon: const Icon(Icons.done, size: 30, color: Colors.white),
+          onPressed: () {
+            ToDoDatabase.instance.create(ToDo(
+                category: '',
+                createdAt: DateTime.now().toString(),
+                isCompleted: 0,
+                isImportant: 0,
+                text: textController.text,
+                title: titleController.text));
+          },
+        ),
       ],
       backgroundColor: const_color.gulfBlue,
       bottomOpacity: 0.0,
