@@ -73,7 +73,7 @@ class ToDoDatabase {
   Future<List<ToDo>> readAllTodos() async {
     final db = await instance.database;
 
-    const orderBy = '${ToDoFields.createdAt} ASC';
+    const orderBy = '${ToDoFields.createdAt} DESC';
 
     final result = await db.query(tableTodos, orderBy: orderBy);
     return result.map((json) => ToDo.fromJson(json)).toList();

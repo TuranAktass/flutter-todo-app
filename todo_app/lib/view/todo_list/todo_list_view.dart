@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:todo_app/component/app_drawer.dart';
 import 'package:todo_app/data_model/todo.dart';
 import 'package:todo_app/database/database.dart';
-import 'package:todo_app/utils/color_constants.dart' as const_color;
+import 'package:todo_app/utils/constants/color_constants.dart' as const_color;
 
 class ToDoListView extends StatefulWidget {
   const ToDoListView({Key? key}) : super(key: key);

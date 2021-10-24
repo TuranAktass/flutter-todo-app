@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_app/utils/text_constants.dart';
+import 'package:todo_app/utils/constants/text_constants.dart';
 import 'package:todo_app/view/home/home_view.dart';
 
 void main() => runApp(MaterialApp(
